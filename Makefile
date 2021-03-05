@@ -14,7 +14,7 @@ docker-start:
 	docker-compose up -d
 
 docker-tests:
-	@docker exec -it lumen-book bash -c "./vendor/bin/phpunit"
+	@docker exec -it lumen-book bash -c "./vendor/bin/phpunit --verbose"
 
 docker-coverage:
 	@docker exec -it lumen-book bash -c "./vendor/bin/phpunit --coverage-text"

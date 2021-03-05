@@ -39,9 +39,6 @@ jobs:
       - name: Install dependencies
         run: composer install --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
 
-      - name: Generate key
-        run: php artisan key:generate
-
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
 
