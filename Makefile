@@ -8,7 +8,7 @@ docker-build:
 	@docker exec -it lumen-book bash -c "composer install --prefer-source --no-interaction"
 
 docker-down:
-	docker-compose down
+	docker-compose down --rmi all -v --remove-orphans
 
 docker-start:
 	docker-compose up -d

@@ -7,7 +7,7 @@ services:
         uid: 1000
     container_name: lumen-book
     ports:
-      - 8001:80
+      - 80:80
     environment:
       - APACHE_RUN_USER=#1000
       - APACHE_RUN_GROUP=#1000
