@@ -3,8 +3,7 @@ name: ci/cd workflow
 on:
   push:
     branches:
-      - develop
-      - features/*
+      - main
   pull_request:
 
 jobs:
