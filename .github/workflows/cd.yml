@@ -1,83 +1,36 @@
-name: ci/cd workflow
+name: build
 
 on:
   push:
     branches:
       - main
-  pull_request:
 
 jobs:
-  tests:
+  build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php: [7.2,7,3]
-
-    name: Test - PHP ${{ matrix.php }}
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Cache PHP dependencies
-        uses: actions/cache@v1
+      - name: Publish to Github Packages Registry
+        uses: elgohr/Publish-Docker-Github-Action@master
         with:
-          path: vendor
-          key: dependencies-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd
-          coverage: none
-
-      - name: Copy ENV Laravel Configuration for CI
-        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-
-      - name: Install dependencies
-        run: composer install --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
-
-      - name: Generate key
-        run: php artisan key:generate
-
-      - name: Execute tests
-        run: vendor/bin/phpunit --verbose
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: tests
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Cache PHP dependencies
-        uses: actions/cache@v1
-        with:
-          path: vendor
-          key: dependencies-php-composer-${{ hashFiles('**/composer.lock') }}
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.1
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd
-          coverage: none
-
-      - name: Install dependencies
-        run: composer install --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
-
-      - name: Copy dotenv file
-        run: php -r "file_put_contents(__DIR__ . '/.env', '${{ secrets.DOT_ENV }}');"
-
-      - name: Deploy
-        uses: AEnterprise/rsync-deploy@v1.0
+          name: my_github_username/my_repository_name/my_image_name
+          registry: docker.pkg.github.com
+          username: ${{ secrets.GITHUB_USERNAME }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          dockerfile: Dockerfile-prod
+          tags: latest
+      - name: Deploy package to digitalocean
+        uses: appleboy/ssh-action@master
         env:
-          DEPLOY_KEY: ${{ secrets.KEY }}
-          ARGS: '-avzh --exclude=".*"'
-          SERVER_PORT: ${{ secrets.PORT }}
-          FOLDER: "./"
-          SERVER_IP: ${{ secrets.HOST }}
-          USERNAME: ${{ secrets.USERNAME }}
-          SERVER_DESTINATION: "/var/www/html"
+          GITHUB_USERNAME: ${{ secrets.GITHUB_USERNAME }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          envs: GITHUB_USERNAME, GITHUB_TOKEN
+          script: |
+            docker stop $(docker ps -a -q)
+            docker login docker.pkg.github.com -u $GITHUB_USERNAME -p $GITHUB_TOKEN
+            docker pull docker.pkg.github.com/my_github_username/my_repository_name/my_image_name:latest
+            docker run -dit -p 80:80 docker.pkg.github.com/my_github_username/my_repository_name/my_image_name:latest
