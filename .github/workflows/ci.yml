@@ -41,54 +41,18 @@ jobs:
 
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
-  build:
+  build-and-push-image:
     runs-on: ubuntu-latest
+    needs: test
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
+      - name: Build container image
+        uses: docker/build-push-action@v1
         with:
-          fetch-depth: '0'
-
-      - name: Tag
-        uses: ChloePlanet/github-tag-action@master
-        id: tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WITH_V: true
-          RELEASE_BRANCHES: main
-
-      - name: Publish Docker Image
-        uses: machine-learning-apps/gpr-docker-publish@master
-        id: docker
-        with:
-          IMAGE_NAME: 'books_app'
-          TAG: ${{ steps.tag.outputs.new_tag }}
-          DOCKERFILE_PATH: 'Dockerfile'
-          BUILD_CONTEXT: '.'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.tag.outputs.new_tag }}
-          release_name: Release ${{ steps.tag.outputs.new_tag }}
-          draft: false
-          prerelease: false
-
-      - name: Upload Binaries to Release (Linux)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bin/main-linux-amd64
-          asset_name: main-linux-amd64
-          asset_content_type: application/octet-stream
-
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: ${{ github.repository }}/ogha-devops-backend
+          tag_with_sha: true
+          tag_with_ref: true

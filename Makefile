@@ -23,7 +23,7 @@ docker-ssh:
 	@docker exec -it lumen-book bash
 
 docker-stop-all:
-	@docker stop $(docker ps -a -q)
+	docker stop $(docker ps -a -q)
 
 define HELP
 # Docker
