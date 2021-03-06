@@ -44,10 +44,8 @@ jobs:
   push_to_registry:
     name: Push Docker image to GitHub Packages
     runs-on: ubuntu-latest
-    steps:
-      - name: Check out the repo
-        uses: actions/checkout@v2
 
+    steps:
       - name: Push to GitHub Packages
         uses: docker/build-push-action@v2
         with:
@@ -59,3 +57,23 @@ jobs:
           tag_with_ref: true
           push: true
           tags: user/app:latest
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: marcware
+          password: b3782a58-68ab-433a-93bb-25ff060234f0
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: user/app:latest
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
