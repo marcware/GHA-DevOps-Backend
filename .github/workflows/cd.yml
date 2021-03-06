@@ -12,15 +12,20 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           GITHUB_USERNAME: ${{ secrets.GITHUB_USERNAME }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: "479276b34d5262e8035673b1a2add7719a825566"
+         # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          host: web1.marcware.es
+          host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
           envs: GITHUB_USERNAME, GITHUB_TOKEN
           script: |
+           echo $GITHUB_USERNAME
+           echo $GITHUB_TOKEN
            docker stop $(docker ps -a -q)
            docker login docker.pkg.github.com -u $GITHUB_USERNAME -p $GITHUB_TOKEN
+           echo $GITHUB_USERNAME
+           echo $GITHUB_TOKEN
            docker pull docker.pkg.github.com/marcware/gha-devops-backend/books_app:latest
            docker run -dit -p 80:80 docker.pkg.github.com/marcware/gha-devops-backend/books_app:latest
