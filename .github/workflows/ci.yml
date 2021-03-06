@@ -17,26 +17,40 @@ jobs:
     name: Test - PHP ${{ matrix.php }}
 
     steps:
-      - name: Copy Repo Files
-        uses: actions/checkout@master
-      - name: List
-        run: ls -la
-      - name: Build the stack
-        run: docker-compose up -d
-      - name: Test
-        run: make docker-tests
+      - name: Checkout code
+        uses: actions/checkout@v2
 
+      - name: Cache PHP dependencies
+        uses: actions/cache@v1
+        with:
+          path: vendor
+          key: dependencies-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd
+          coverage: none
+
+      - name: Copy ENV Laravel Configuration for CI
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+      - name: Install dependencies
+        run: composer install --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+
+      - name: Execute tests
+        run: vendor/bin/phpunit --verbose
   push_to_registry:
     name: Push Docker image to GitHub Packages
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
-
       - name: Push to GitHub Packages
         uses: docker/build-push-action@v2
         with:
-          username: ${{ github.actor }}
+          username: "marcware"
           #password: ${{ secrets.GITHUB_TOKEN }}
           password: "c57bb3e99719fe63c65f3af0f799753b4807abe5"
           registry: docker.pkg.github.com
