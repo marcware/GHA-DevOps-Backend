@@ -22,7 +22,7 @@ jobs:
       - name: List
         run: ls -la
       - name: Build the stack
-        run: docker-composer up -d
+        run: docker-compose up -d
       - name: Test
         run: make docker-tests
 
