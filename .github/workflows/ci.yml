@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Build the stack
-        run: docker-compose up -d
+        run: docker-compose up
       - name: Test
         run: make docker-tests
 
