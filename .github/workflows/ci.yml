@@ -20,7 +20,7 @@ jobs:
       - name: Copy Repo Files
         uses: actions/checkout@master
       - name: Build the stack
-        run: ls -la
+        run: composer up -d
       - name: Test
         run: make docker-tests
 
