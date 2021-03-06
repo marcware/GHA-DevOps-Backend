@@ -3,8 +3,6 @@ services:
   lumen-book:
     build:
       context: '.'
-      args:
-        uid: 1000
     container_name: lumen-book
     ports:
       - 80:80
