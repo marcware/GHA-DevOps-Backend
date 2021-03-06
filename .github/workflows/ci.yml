@@ -17,6 +17,8 @@ jobs:
     name: Test - PHP ${{ matrix.php }}
 
     steps:
+      - name: Copy Repo Files
+        uses: actions/checkout@master
       - name: Build the stack
         run: ls -la
       - name: Test
