@@ -58,3 +58,4 @@ jobs:
           repository: marcware/gha-devops-backend/books_app
           tag_with_ref: true
           push: true
+          tags: user/app:latest
