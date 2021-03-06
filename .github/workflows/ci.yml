@@ -41,28 +41,18 @@ jobs:
 
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
-  build:
+  push_to_registry:
+    name: Push Docker image to GitHub Packages
     runs-on: ubuntu-latest
-    #needs: tests
     steps:
-      - name: Checkout code
+      - name: Check out the repo
         uses: actions/checkout@v2
-
-      - name: Tag
-        uses: ChloePlanet/github-tag-action@master
-        id: tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WITH_V: true
-          RELEASE_BRANCHES: main
-
-      - name: Publish Docker Image
-        uses: machine-learning-apps/gpr-docker-publish@master
-        id: docker
+      - name: Push to GitHub Packages
+        uses: docker/build-push-action@v1
         with:
-          IMAGE_NAME: 'books_app'
-          TAG: ${{ steps.tag.outputs.new_tag }}
-          DOCKERFILE_PATH: 'Dockerfile'
-          BUILD_CONTEXT: '.'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ github.actor }}
+          #password: ${{ secrets.GITHUB_TOKEN }}
+          password: "c57bb3e99719fe63c65f3af0f799753b4807abe5"
+          registry: docker.pkg.github.com
+          repository: marcware/gha-devops-backend/books_app
+          tag_with_ref: true
