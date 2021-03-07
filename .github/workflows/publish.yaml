@@ -33,7 +33,7 @@ jobs:
           DOCKERFILE_PATH: 'Dockerfile'
           BUILD_CONTEXT: '.'
         env:
-            GITHUB_TOKEN: ${{ secrets.TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install SSH key
         if: ${{ steps.tag.outputs.tag_generated == 1 }}
