@@ -35,12 +35,23 @@ jobs:
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    #  - name: Install SSH key
+        #    if: ${{ steps.tag.outputs.tag_generated == 1 }}
+        #uses: shimataro/ssh-key-action@v2
+          #with:
+          #name: id_rsa
+          #key: ${{ secrets.KEY_PUBLIC }}
+          #known_hosts: ${{ secrets.HOST }}
+
       - name: Install SSH key
-        if: ${{ steps.tag.outputs.tag_generated == 1 }}
-        uses: shimataro/ssh-key-action@v2
+        uses: webfactory/ssh-agent@v0.5.0
         with:
-          key: ${{ secrets.KEY }}
-          known_hosts: ${{ secrets.HOST }}
+          ssh-private-key: ${{ secrets.KEY_PUBLIC }}
+
+      - name: SSH key list
+        run: |
+          cd ~/.ssh
+          ls -la
 
       - name: Deploy context
         if: ${{ steps.tag.outputs.tag_generated == 1 }}
@@ -51,8 +62,8 @@ jobs:
       - name: Deploy remote login
         if: ${{ steps.tag.outputs.tag_generated == 1 }}
         run: |
-            # docker --context remote login -u ${{ secrets.GITHUB_USERNAME }} -p ${{ secrets.TOKEN }} docker.pkg.github.com
-            docker --context remote login -u marcware -p c57bb3e99719fe63c65f3af0f799753b4807abe5 docker.pkg.github.com
+            docker --context remote login -u ${{ secrets.USERNAME }} -p ${{ secrets.TOKEN }} docker.pkg.github.com
+            #docker --context remote login -u marcware -p c57bb3e99719fe63c65f3af0f799753b4807abe5 docker.pkg.github.com
 
 
       - name: Deploy docker-compose-prod
