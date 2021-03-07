@@ -33,19 +33,7 @@ jobs:
           DOCKERFILE_PATH: 'Dockerfile'
           BUILD_CONTEXT: '.'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Release
-        if: ${{ steps.tag.outputs.tag_generated == 1 }}
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.tag.outputs.new_tag }}
-          release_name: Release ${{ steps.tag.outputs.new_tag }}
-          draft: false
-          prerelease: false
+            GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
       - name: Install SSH key
         if: ${{ steps.tag.outputs.tag_generated == 1 }}
@@ -54,11 +42,23 @@ jobs:
           key: ${{ secrets.KEY }}
           known_hosts: ${{ secrets.HOST }}
 
-      - name: Deploy
+      - name: Deploy context
         if: ${{ steps.tag.outputs.tag_generated == 1 }}
         run: |
           docker context create remote --docker "host=ssh://${{ secrets.USERNAME }}@${{ secrets.HOST }}"
-          docker --context remote login -u ${{ secrets.GITHUB_USERNAME }} -p ${{ secrets.TOKEN }} docker.pkg.github.com
-          COMPOSE_HTTP_TIMEOUT=120 TAG=${{ steps.tag.outputs.new_tag }} docker-compose --context remote -f docker-compose-prod.yml pull app
-          COMPOSE_HTTP_TIMEOUT=120 TAG=${{ steps.tag.outputs.new_tag }} docker-compose --context remote -f docker-compose-prod.yml up -d app
+          docker context list
+
+      - name: Deploy remote login
+        if: ${{ steps.tag.outputs.tag_generated == 1 }}
+        run: |
+            # docker --context remote login -u ${{ secrets.GITHUB_USERNAME }} -p ${{ secrets.TOKEN }} docker.pkg.github.com
+            docker --context remote login -u marcware -p c57bb3e99719fe63c65f3af0f799753b4807abe5 docker.pkg.github.com
+
+
+      - name: Deploy docker-compose-prod
+        if: ${{ steps.tag.outputs.tag_generated == 1 }}
+        run: |
+            COMPOSE_HTTP_TIMEOUT=120 TAG=${{ steps.tag.outputs.new_tag }} docker-compose --context remote -f docker-compose-prod.yml pull app
+            COMPOSE_HTTP_TIMEOUT=120 TAG=${{ steps.tag.outputs.new_tag }} docker-compose --context remote -f docker-compose-prod.yml up -d app
+
 
