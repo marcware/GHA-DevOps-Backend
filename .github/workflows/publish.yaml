@@ -46,3 +46,19 @@ jobs:
           release_name: Release ${{ steps.tag.outputs.new_tag }}
           draft: false
           prerelease: false
+
+      - name: Install SSH key
+        if: ${{ steps.tag.outputs.tag_generated == 1 }}
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.KEY }}
+          known_hosts: ${{ secrets.HOST }}
+
+      - name: Deploy
+        if: ${{ steps.tag.outputs.tag_generated == 1 }}
+        run: |
+          docker context create remote --docker "host=ssh://${{ secrets.USERNAME }}@${{ secrets.HOST }}"
+          docker --context remote login -u ${{ secrets.GITHUB_USERNAME }} -p ${{ secrets.TOKEN }} docker.pkg.github.com
+          COMPOSE_HTTP_TIMEOUT=120 TAG=${{ steps.tag.outputs.new_tag }} docker-compose --context remote -f docker-compose-prod.yml pull app
+          COMPOSE_HTTP_TIMEOUT=120 TAG=${{ steps.tag.outputs.new_tag }} docker-compose --context remote -f docker-compose-prod.yml up -d app
+
