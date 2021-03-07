@@ -6,7 +6,6 @@ on:
       - develop
       - features/*
   pull_request:
-
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -41,39 +40,49 @@ jobs:
 
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
-  push_to_registry:
-    name: Push Docker image to GitHub Packages
+
+  build:
+    name: Publish
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [ 7.1 ]
 
     steps:
-      - name: Push to GitHub Packages
-        uses: docker/build-push-action@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
         with:
-          username: "marcware"
-          #password: ${{ secrets.GITHUB_TOKEN }}
-          password: "c57bb3e99719fe63c65f3af0f799753b4807abe5"
-          registry: docker.pkg.github.com
-          repository: marcware/gha-devops-backend/books_app
-          tag_with_ref: true
-          push: true
-          tags: user/app:latest
-  docker:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
+          fetch-depth: '0'
+
+      - name: Tag
+        uses: ChloePlanet/github-tag-action@master
+        id: tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          RELEASE_BRANCHES: main
+
+      - name: Publish Docker Image
+        if: ${{ steps.tag.outputs.tag_generated == 1 }}
+        uses: machine-learning-apps/gpr-docker-publish@master
+        id: docker
         with:
-          username: marcware
-          password: b3782a58-68ab-433a-93bb-25ff060234f0
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v2
+          IMAGE_NAME: 'geekshubs-library_app'
+          TAG: ${{ steps.tag.outputs.new_tag }}
+          DOCKERFILE_PATH: 'Dockerfile'
+          BUILD_CONTEXT: '.'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        if: ${{ steps.tag.outputs.tag_generated == 1 }}
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          push: true
-          tags: user/app:latest
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
+          tag_name: ${{ steps.tag.outputs.new_tag }}
+          release_name: Release ${{ steps.tag.outputs.new_tag }}
+          draft: false
+          prerelease: false
+

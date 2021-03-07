@@ -57,4 +57,8 @@ RUN useradd -G www-data,root -u 1000 -d /home/devuser devuser && \
     mkdir -p /home/devuser/.composer && \
     chown -R devuser:devuser /home/devuser
 
+#Directorio trabajo.
+WORKDIR /var/www/html
+EXPOSE 80
+
 
