@@ -35,18 +35,14 @@ jobs:
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    #  - name: Install SSH key
-        #    if: ${{ steps.tag.outputs.tag_generated == 1 }}
-        #uses: shimataro/ssh-key-action@v2
-          #with:
-          #name: id_rsa
-          #key: ${{ secrets.KEY_PUBLIC }}
-          #known_hosts: ${{ secrets.HOST }}
-
       - name: Install SSH key
-        uses: webfactory/ssh-agent@v0.5.0
+        if: ${{ steps.tag.outputs.tag_generated == 1 }}
+        uses: shimataro/ssh-key-action@v2
         with:
-          ssh-private-key: ${{ secrets.KEY_PUBLIC }}
+          name: id_rsa
+          key: ${{ secrets.KEY_PUBLIC }}
+          known_hosts: ${{ secrets.KNOWN_HOST }}
+
 
       - name: SSH key list
         run: |
