@@ -16,8 +16,4 @@ jobs:
           key: ${{ secrets.KEY_PRIVATE }}
           port: ${{ secrets.PORT }}
           script: |
-            docker-compose down
-            git fetch --all
-            git reset --hard origin/main
-            docker pull marcware/books_app:lastest
-            docker-compose docker-compose-prod.yml up -d
+            ls -la
