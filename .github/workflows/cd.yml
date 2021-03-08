@@ -13,7 +13,7 @@ jobs:
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY_PUBLIC }}
+          key: ${{ secrets.KEY_PRIVATE }}
           port: ${{ secrets.PORT }}
           script: |
             docker-compose down
