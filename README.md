@@ -4,7 +4,7 @@
 ##CI/CD
 
 Los arc
-##Configurando los secreto  s
+##Configurando los secreto  sd
 patch version
 
 git add .
