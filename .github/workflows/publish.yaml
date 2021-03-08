@@ -58,7 +58,6 @@ jobs:
         if: ${{ steps.tag.outputs.tag_generated == 1 }}
         run: |
             docker --context remote login -u ${{ secrets.USERNAME }} -p ${{ secrets.TOKEN }} docker.pkg.github.com
-            #docker --context remote login -u marcware -p c57bb3e99719fe63c65f3af0f799753b4807abe5 docker.pkg.github.com
 
 
       - name: Deploy docker-compose-prod
