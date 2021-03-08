@@ -24,6 +24,9 @@ docker-ssh:
 
 docker-stop-all:
 	docker stop $(docker ps -a -q)
+ssh-web1:
+	ssh -i ./SSH/id_rsa_marcos.pub root@web1.marcware.es
+
 
 define HELP
 # Docker
