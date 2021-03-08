@@ -1,7 +1,7 @@
 version: '3.5'
 services:
   lumen-book:
-    image: docker.pkg.github.com/marcware/gha-devops-backend/geekshubs-library_app:${TAG}
+    image: docker.io/marcware/books_app:lastest
     container_name: lumen-book
     ports:
       - 80:80
