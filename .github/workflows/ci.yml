@@ -63,18 +63,6 @@ jobs:
           WITH_V: true
           RELEASE_BRANCHES: main
 
-      - name: Publish Docker Image
-        if: ${{ steps.tag.outputs.tag_generated == 1 }}
-        uses: machine-learning-apps/gpr-docker-publish@master
-        id: docker
-        with:
-          IMAGE_NAME: 'geekshubs-library_app'
-          TAG: ${{ steps.tag.outputs.new_tag }}
-          DOCKERFILE_PATH: 'Dockerfile'
-          BUILD_CONTEXT: '.'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Create Release
         if: ${{ steps.tag.outputs.tag_generated == 1 }}
         id: create_release
