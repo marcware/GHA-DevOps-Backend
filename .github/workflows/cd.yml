@@ -18,12 +18,13 @@ jobs:
           script: |
             ls -la
             cd GHA-DevOps-Backend/
+            docker-compose ps
             docker-compose stop
+            docker-compose ps
             git fetch --all
             git reset --hard origin/main
             docker pull marcware/books_app:lastest
             docker-compose -f docker-compose-prod.yml up
-            docker exec -it lumen-book composer update
-            cp .env.pro .env
             chmod -R ug+rwx storage bootstrap/cache vendor
+            docker-compose ps
 
