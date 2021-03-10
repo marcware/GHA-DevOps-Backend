@@ -23,6 +23,6 @@ jobs:
             docker pull marcware/books_app:lastest
             docker-compose -f docker-compose-prod.yml up
             docker exec -it lumen-book composer install
-            CREAR EL PUNTO ENV
-            DAR PERMISOS A VENDORS Y A STORAGE
+            cp .env.pro .env
+            chmod -R ug+rwx storage bootstrap/cache vendor
 
