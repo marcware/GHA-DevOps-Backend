@@ -25,26 +25,25 @@ jobs:
             git reset --hard origin/main
 
       - name: Deploy package to digitalocean pull DockerHub
-          uses: appleboy/ssh-action@master
-          with:
-            host: ${{ secrets.HOST }}
-            username: ${{ secrets.USERNAME }}
-            key: ${{ secrets.KEY_PRIVATE }}
-            port: ${{ secrets.PORT }}
-            script: |
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY_PRIVATE }}
+          port: ${{ secrets.PORT }}
+          script: |
               cd GHA-DevOps-Backend/
               docker pull marcware/books_app:lastest
               docker-compose -f docker-compose-prod.yml up
 
       - name: Deploy package to digitalocean pull DockerHub Vendors
-          uses: appleboy/ssh-action@master
-          with:
-            host: ${{ secrets.HOST }}
-            username: ${{ secrets.USERNAME }}
-            key: ${{ secrets.KEY_PRIVATE }}
-            port: ${{ secrets.PORT }}
-            script: |
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY_PRIVATE }}
+          port: ${{ secrets.PORT }}
+          script: |
               cd GHA-DevOps-Backend/
               chmod -R ug+rwx storage bootstrap/cache vendor
               docker-compose ps
-
