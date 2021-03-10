@@ -19,7 +19,7 @@ jobs:
             ls -la
             cd GHA-DevOps-Backend/
             docker-compose ps
-            docker-compose stop
+            docker-compose down
             docker-compose ps
             git fetch --all
             git reset --hard origin/main
