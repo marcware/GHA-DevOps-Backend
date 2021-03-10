@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy package to digitalocean
+      - name: Deploy package to digitalocean Stop docker
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
@@ -23,8 +23,28 @@ jobs:
             docker-compose ps
             git fetch --all
             git reset --hard origin/main
-            docker pull marcware/books_app:lastest
-            docker-compose -f docker-compose-prod.yml up
-            chmod -R ug+rwx storage bootstrap/cache vendor
-            docker-compose ps
+
+      - name: Deploy package to digitalocean pull DockerHub
+          uses: appleboy/ssh-action@master
+          with:
+            host: ${{ secrets.HOST }}
+            username: ${{ secrets.USERNAME }}
+            key: ${{ secrets.KEY_PRIVATE }}
+            port: ${{ secrets.PORT }}
+            script: |
+              cd GHA-DevOps-Backend/
+              docker pull marcware/books_app:lastest
+              docker-compose -f docker-compose-prod.yml up
+
+      - name: Deploy package to digitalocean pull DockerHub Vendors
+          uses: appleboy/ssh-action@master
+          with:
+            host: ${{ secrets.HOST }}
+            username: ${{ secrets.USERNAME }}
+            key: ${{ secrets.KEY_PRIVATE }}
+            port: ${{ secrets.PORT }}
+            script: |
+              cd GHA-DevOps-Backend/
+              chmod -R ug+rwx storage bootstrap/cache vendor
+              docker-compose ps
 
